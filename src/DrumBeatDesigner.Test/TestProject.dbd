@@ -1,0 +1,11 @@
+﻿{
+  "$id": "1",
+  "Channels": {
+    "$id": "2",
+    "$values": []
+  },
+  "NumberOfMeasures": 1,
+  "NumberOfBeatsPerMeasure": 4,
+  "Name": "Test Project",
+  "BeatsPerMinute": 123
+}

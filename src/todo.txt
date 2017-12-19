@@ -1,0 +1,44 @@
+Mega Important
+==============
+- dirty tracking.
+
+
+
+Pretty Important
+================
+- create song
+	- ? maybe.
+- voice pool for player.
+	- probably have to be per channel to accomodate different wave formats per channel.
+
+
+
+
+Not Super Important
+===================
+- clear/reset beats
+- style beat checkboxes.
+
+
+
+Done
+====
+- implement scrolling in measures pane.
+- add measure
+- delete measure
+- when adding channel, set measures on new channel to current number.
+- alternating background each measure.
+- increase resolution (beats per measure) 
+- decrease resolution (beats per measure)
+- volume control on each channel (volume slider and mute).
+- enable/disable volume controls when playing.
+- sync vertical scrolling of scroll viewers.
+- when playing, show current beat.
+- show play time (in status bar?)
+- export drum beat (naudio).
+- save project
+- new project
+- icons for new/open/save.
+- icon disabled state.
+- custom slider for channel volume (or converter that switches sound icon based on volume level/mute).
+- validate selected file (just wavs).
