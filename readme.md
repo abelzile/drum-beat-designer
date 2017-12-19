@@ -1,6 +1,6 @@
 # drum-beat-designer
 
-Drum Beat Designer is a very simple drum machine for Windows. It started as a fun project to help me learn both WPF and .NET audio processing.
+Drum Beat Designer is a very simple drum machine for Windows. It started as a fun project to help me learn both WPF and .NET audio processing using the NAudio library.
 
 ## Installation
 
