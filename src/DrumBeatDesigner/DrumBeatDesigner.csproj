@@ -60,9 +60,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MoonAndSun.Commons.dll</HintPath>
     </Reference>
-    <Reference Include="NAudio, Version=1.7.0.11, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NAudio\NAudio.dll</HintPath>
+    <Reference Include="NAudio, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.8.4\lib\net35\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.5.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -109,9 +108,13 @@
     </Compile>
     <Compile Include="ISoundFileValidator.cs" />
     <Compile Include="Models\Beat.cs" />
-    <Compile Include="Models\LoopExporter.cs" />
-    <Compile Include="Models\Player.cs" />
+    <Compile Include="Models\PatternExporter.cs" />
+    <Compile Include="Models\Pattern.cs" />
+    <Compile Include="Models\PatternItem.cs" />
+    <Compile Include="Models\PatternPlayer.cs" />
     <Compile Include="Models\ProjectSerializer.cs" />
+    <Compile Include="Models\SongPlayer.cs" />
+    <Compile Include="Models\Sound.cs" />
     <Compile Include="SoundFileValidator.cs" />
     <Compile Include="ViewModels\ExportLoopViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -137,8 +140,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Channel.cs" />
-    <Compile Include="Models\Measure.cs" />
+    <Compile Include="Models\Instrument.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

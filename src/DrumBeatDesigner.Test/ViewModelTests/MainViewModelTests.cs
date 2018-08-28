@@ -35,16 +35,30 @@ namespace DrumBeatDesigner.Test.ViewModelTests
         }
 
         [TestMethod]
-        public void CanAddChannel()
+        public void CanAddPattern()
         {
             MainViewModel vm = CreateNewMainViewModel();
             vm.NewProjectCommand.Execute();
 
-            Assert.AreEqual<int>(vm.SelectedProject.Channels.Count, 0);
+            Assert.AreEqual(0, vm.SelectedProject.Patterns.Count);
 
-            vm.AddChannelCommand.Execute();
+            vm.AddPatternCommand.Execute();
 
-            Assert.AreEqual<int>(vm.SelectedProject.Channels.Count, 1);
+            Assert.AreEqual(1, vm.SelectedProject.Patterns.Count);
+        }
+
+        [TestMethod]
+        public void CanAddInstrument()
+        {
+            MainViewModel vm = CreateNewMainViewModel();
+            vm.NewProjectCommand.Execute();
+            vm.AddPatternCommand.Execute();
+
+            Assert.AreEqual<int>(0, vm.SelectedProject.SelectedPattern.Instruments.Count);
+
+            vm.AddInstrumentCommand.Execute();
+
+            Assert.AreEqual<int>(1, vm.SelectedProject.SelectedPattern.Instruments.Count);
         }
 
         [TestMethod]
@@ -52,31 +66,32 @@ namespace DrumBeatDesigner.Test.ViewModelTests
         {
             MainViewModel vm = CreateNewMainViewModel();
             vm.NewProjectCommand.Execute();
+            vm.AddPatternCommand.Execute();
 
-            Assert.AreEqual(vm.Player.IsPlaying, false);
+            Assert.AreEqual(false, vm.PatternPlayer.IsPlaying);
 
-            vm.PlayOrStopCommand.Execute();
+            vm.PlayOrStopPatternCommand.Execute();
 
-            Assert.AreEqual(vm.Player.IsPlaying, true);
+            Assert.AreEqual(true, vm.PatternPlayer.IsPlaying);
 
-            vm.PlayOrStopCommand.Execute();
+            vm.PlayOrStopPatternCommand.Execute();
 
-            Assert.AreEqual(vm.Player.IsPlaying, false);
+            Assert.AreEqual(false, vm.PatternPlayer.IsPlaying);
         }
 
         [TestMethod]
-        public void CanDeleteChannel()
+        public void CanDeleteInstrument()
         {
             MainViewModel vm = CreateNewMainViewModel();
             vm.NewProjectCommand.Execute();
+            vm.AddPatternCommand.Execute();
+            vm.AddInstrumentCommand.Execute();
 
-            vm.AddChannelCommand.Execute();
+            Instrument c = vm.SelectedProject.SelectedPattern.Instruments.First();
 
-            Channel c = vm.SelectedProject.Channels.First();
+            vm.DeleteInstrumentCommand.Execute(c);
 
-            vm.DeleteChannelCommand.Execute(c);
-
-            Assert.AreEqual(vm.SelectedProject.Channels.Count, 0);
+            Assert.AreEqual(0, vm.SelectedProject.SelectedPattern.Instruments.Count);
         }
 
         [TestMethod]
@@ -85,7 +100,7 @@ namespace DrumBeatDesigner.Test.ViewModelTests
             MainViewModel vm = new MainViewModel(new MockSoundFileValidator(), new MockOpenProjectFileDialogService());
             vm.OpenProjectCommand.Execute();
 
-            Assert.AreEqual(vm.SelectedProject.Name, "Test Project");
+            Assert.AreEqual("Test Project", vm.SelectedProject.Name);
         }
 
         public void CanSaveProject()
@@ -118,8 +133,9 @@ namespace DrumBeatDesigner.Test.ViewModelTests
         {
         }
 
-        public string FileName { 
-            get { return "C:\\FakeFile.wav"; } 
+        public string FileName
+        {
+            get { return "C:\\FakeFile.wav"; }
         }
 
         public bool Multiselect { get; set; }

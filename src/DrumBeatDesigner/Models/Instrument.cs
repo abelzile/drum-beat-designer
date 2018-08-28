@@ -4,9 +4,8 @@ using MoonAndSun.Commons.Mvvm;
 
 namespace DrumBeatDesigner.Models
 {
-    public class Channel : NotificationObject
+    public class Instrument : NotificationObject
     {
-        readonly ObservableCollection<Measure> _measures = new ObservableCollection<Measure>();
         bool _isMuted;
         string _name;
         Uri _path;
@@ -14,26 +13,29 @@ namespace DrumBeatDesigner.Models
 
         public bool IsMuted
         {
-            get { return _isMuted; }
+            get => _isMuted;
             set
             {
-                if (value.Equals(_isMuted)) return;
+                if (value.Equals(_isMuted))
+                {
+                    return;
+                }
                 _isMuted = value;
                 RaisePropertyChanged(() => IsMuted);
             }
         }
 
-        public ObservableCollection<Measure> Measures
-        {
-            get { return _measures; }
-        }
+        public ObservableCollection<Beat> Beats { get; } = new ObservableCollection<Beat>();
 
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
-                if (value == _name) return;
+                if (value == _name)
+                {
+                    return;
+                }
                 _name = value;
                 RaisePropertyChanged(() => Name);
             }
@@ -41,10 +43,13 @@ namespace DrumBeatDesigner.Models
 
         public Uri Path
         {
-            get { return _path; }
+            get => _path;
             set
             {
-                if (Equals(value, _path)) return;
+                if (Equals(value, _path))
+                {
+                    return;
+                }
                 _path = value;
                 RaisePropertyChanged(() => Path);
 
@@ -57,10 +62,13 @@ namespace DrumBeatDesigner.Models
 
         public float Volume
         {
-            get { return _volume; }
+            get => _volume;
             set
             {
-                if (value.Equals(_volume)) return;
+                if (value.Equals(_volume))
+                {
+                    return;
+                }
                 _volume = value;
                 RaisePropertyChanged(() => Volume);
             }

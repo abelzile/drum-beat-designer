@@ -33,6 +33,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="140" />
             <RowDefinition Height="1*"/>
             <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
@@ -47,20 +48,9 @@
                 <Button Command="{Binding SaveProjectCommand}">
                     <Image Source="/Resources/Images/disk.png" Style="{StaticResource ToolbarImg}"/>
                 </Button>
-            </ToolBar>
-            <ToolBar>
-                <Button Command="{Binding PlayOrStopCommand}">
-                    <Image Source="{Binding Player.IsPlaying, Converter={StaticResource BoolPlayStopImageConverter}}"/>
-                </Button>
-                
-                <Label HorizontalContentAlignment="Right" 
-                       VerticalContentAlignment="Center">
-                    <TextBlock Text="{Binding PlayTime, StringFormat=mm\\:ss}" 
-                               FontFamily="Consolas"/>
-                </Label>
-                
+
                 <Separator/>
-                
+
                 <Label Content="BPM"
                        IsEnabled="{Binding CanChangeBpm}"/>
                 <xcd:IntegerUpDown Width="55" 
@@ -70,24 +60,118 @@
                                    Maximum="{x:Static models:Project.MaxBpm}"
                                    IsEnabled="{Binding CanChangeBpm}" />
 
-            </ToolBar>
-            
-            <ToolBar>
-                <Button Command="{Binding ExportLoopCommand}">
-                    <Image Source="/Resources/Images/music.png" Style="{StaticResource ToolbarImg}"/>
-                </Button>
+                <Separator/>
+
             </ToolBar>
         </ToolBarTray>
-        
-        
+
         <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            
+            <GridSplitter Grid.Column="1" Grid.RowSpan="2"
+                          Width="5" 
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Stretch" />
+
+            <ToolBarTray Grid.Row="0" Grid.Column="0">
+                <ToolBar>
+                    <Button Command="{Binding AddPatternCommand}">
+                        <Image Source="/Resources/Images/add.png" Style="{StaticResource ToolbarImg}"/>
+                    </Button>
+                    
+
+
+                    <Separator/>
+
+                    <Button Command="{Binding PlayOrStopSongCommand}">
+                        <Image Source="{Binding SongPlayer.IsPlaying, Converter={StaticResource BoolPlayStopImageConverter}}"/>
+                    </Button>
+
+
+                    <!--Label required to ensure toolbars are same height-->
+                    <Label Content="" />
+                </ToolBar>
+            </ToolBarTray>
+
+            <ScrollViewer Name="uxPatterns" Grid.Column="0" Grid.Row="1" 
+                          Padding="0" Margin="0"
+                          VerticalScrollBarVisibility="Hidden" 
+                          HorizontalScrollBarVisibility="Disabled">
+                <ListBox 
+                         ItemsSource="{Binding SelectedProject.Patterns}" 
+                         SelectedItem="{Binding SelectedProject.SelectedPattern}" 
+                         DisplayMemberPath="Name" 
+                         Margin="0" Padding="0" BorderThickness="0" ScrollViewer.CanContentScroll="False">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <EventSetter Event="RequestBringIntoView" Handler="ListBoxItemRequestBringIntoView"/>
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="Height" Value="30" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+
+            </ScrollViewer>
+
+            <ScrollViewer Name="uxPatternItems" 
+                          Grid.Column="2" Grid.Row="1" Padding="1" ScrollChanged="ScrollViewerSynchronize">
+                <ItemsControl ItemsSource="{Binding SelectedProject.Patterns}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                           
+                            <ItemsControl ItemsSource="{Binding PatternItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Height="30" 
+                                                BorderThickness="0, 0, 0, 0"
+                                                BorderBrush="{x:Static SystemColors.InactiveBorderBrush}">
+                                            <CheckBox VerticalAlignment="Center"
+                                                      VerticalContentAlignment="Center"
+                                                      HorizontalAlignment="Center"
+                                                      HorizontalContentAlignment="Center"
+                                                      Margin="2, 0, 2, 0"
+                                                      IsChecked="{Binding IsEnabled}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+
+        </Grid>
+
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
@@ -96,14 +180,36 @@
 
                 <ToolBarTray>
                     <ToolBar>
-                        <Button Command="{Binding AddChannelCommand}">
+                        <Button Command="{Binding AddInstrumentCommand}">
                             <Image Source="/Resources/Images/add.png" Style="{StaticResource ToolbarImg}"/>
                         </Button>
-                        <Label Content=""></Label>
+                        
+                        <Separator/>
+
+                        <Button Command="{Binding PlayOrStopPatternCommand}">
+                            <Image Source="{Binding PatternPlayer.IsPlaying, Converter={StaticResource BoolPlayStopImageConverter}}"/>
+                        </Button>
+
+                        <Label HorizontalContentAlignment="Right" 
+                           VerticalContentAlignment="Center">
+                            <TextBlock Text="{Binding PlayTime, StringFormat=mm\\:ss}" 
+                                   FontFamily="Consolas"/>
+                        </Label>
+
+                        <Separator/>
+
+                        <Button Command="{Binding ExportPatternCommand}">
+                            <Image Source="/Resources/Images/music.png" Style="{StaticResource ToolbarImg}"/>
+                        </Button>
+
+                        <!--Label required to ensure toolbars are same height-->
+                        <Label Content="" />
                     </ToolBar>
+
+                    
                 </ToolBarTray>
 
-                <ScrollViewer x:Name="uxChannels" Grid.Row="1"
+                <ScrollViewer Name="uxInstruments" Grid.Row="1"
                               VerticalScrollBarVisibility="Hidden" 
                               HorizontalScrollBarVisibility="Disabled">
             
@@ -114,7 +220,7 @@
                         </Grid.RowDefinitions>
                         
                         <ItemsControl Grid.Row="0"
-                                      ItemsSource="{Binding SelectedProject.Channels}">
+                                      ItemsSource="{Binding SelectedProject.SelectedPattern.Instruments}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel />
@@ -137,7 +243,6 @@
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="1*"/>
                                                 <ColumnDefinition Width="Auto"/>
-                                                
                                             </Grid.ColumnDefinitions>
                                     
                                             <!--Row 0-->
@@ -150,10 +255,9 @@
                                             <Button Grid.Row="0"
                                                     Grid.Column="2" 
                                                     Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, 
-                                                                      Path=DataContext.DeleteChannelCommand}"
+                                                                      Path=DataContext.DeleteInstrumentCommand}"
                                                     CommandParameter="{Binding}"
-                                                    HorizontalAlignment="Right"
-                                                    >
+                                                    HorizontalAlignment="Right">
                                                 <Image Source="/Resources/Images/delete.png" 
                                                        Width="16"
                                                        Height="16"/>
@@ -173,9 +277,11 @@
                                                     Maximum="1" 
                                                     VerticalAlignment="Center"
                                                     Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                    IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, 
-                                                                                                  Path=DataContext.Player.IsPlaying, 
-                                                                                                  Converter={StaticResource InverseBoolConverter}}"/>
+                                                    IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                                                                       AncestorType=ItemsControl, 
+                                                                                                       AncestorLevel=1}, 
+                                                                        Path=DataContext.PatternPlayer.IsPlaying, 
+                                                                        Converter={StaticResource InverseBoolConverter}}"/>
 
                                             <CheckBox Grid.Row="1"
                                                       Grid.Column="2"
@@ -183,7 +289,7 @@
                                                       IsChecked="{Binding IsMuted}" 
                                                       VerticalAlignment="Center"
                                                       IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, 
-                                                                                                  Path=DataContext.Player.IsPlaying, 
+                                                                                                  Path=DataContext.PatternPlayer.IsPlaying, 
                                                                                                   Converter={StaticResource InverseBoolConverter}}"
                                                       Content="Mute"/>
 
@@ -223,19 +329,10 @@
 
                 <ToolBarTray>
                     <ToolBar>
-                        <Label Content="Measures"/>
+                        <Label Content="Length"/>
                         <xcd:IntegerUpDown Width="40"
                                            Increment="1" 
-                                           Value="{Binding Path=SelectedProject.NumberOfMeasures, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                           Minimum="{x:Static models:Project.MinMeasures}"
-                                           Maximum="{x:Static models:Project.MaxMeasures}"
-                                           ParsingNumberStyle="Integer"
-                                           IsEnabled="{Binding CanChangeMeasuresAndBeats}"/>
-                        <Separator/>
-                        <Label Content="Beats per Measure"/>
-                        <xcd:IntegerUpDown Width="40"
-                                           Increment="1" 
-                                           Value="{Binding Path=SelectedProject.NumberOfBeatsPerMeasure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                           Value="{Binding Path=SelectedProject.SelectedPattern.NumberOfBeatsPerMeasure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                            Minimum="{x:Static models:Project.MinBeatsPerMeasure}"
                                            Maximum="{x:Static models:Project.MaxBeatsPerMeasure}"
                                            ParsingNumberStyle="Integer"
@@ -244,12 +341,13 @@
                     </ToolBar>
                 </ToolBarTray>
 
-                <ScrollViewer Grid.Row="1"
+                <ScrollViewer Name="uxBeats"
+                              Grid.Row="1"
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Auto" 
                               ScrollChanged="ScrollViewerSynchronize">
             
-                    <ItemsControl ItemsSource="{Binding SelectedProject.Channels}">
+                    <ItemsControl ItemsSource="{Binding SelectedProject.SelectedPattern.Instruments}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel />
@@ -257,68 +355,35 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-
-                                <ItemsControl ItemsSource="{Binding Measures}"
-                                              AlternationCount="{x:Static system:Int32.MaxValue}">
+                            
+                                <ItemsControl ItemsSource="{Binding Beats}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"  />
+                                            <StackPanel Orientation="Horizontal" 
+                                                        />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-
-                                            <Border Height="50" 
-                                                    BorderThickness="0, 0, 1, 1" 
-                                                    BorderBrush="{x:Static SystemColors.InactiveBorderBrush}">
-                                                
-                                                <ItemsControl x:Name="MeasureContainer"
-                                                              ItemsSource="{Binding Beats}" 
-                                                              AlternationCount="{x:Static system:Int32.MaxValue}">
-                                                    <ItemsControl.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <StackPanel Orientation="Horizontal" 
-                                                                        />
-                                                        </ItemsPanelTemplate>
-                                                    </ItemsControl.ItemsPanel>
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <Border BorderThickness="0"
-                                                                    Background="{Binding IsPlaying, Converter={StaticResource BoolBrushConverter}}">
-                                                                <CheckBox VerticalAlignment="Center"
-                                                                          VerticalContentAlignment="Center"
-                                                                          HorizontalAlignment="Center"
-                                                                          HorizontalContentAlignment="Center"
-                                                                          Margin="5, 0, 5, 0"
-                                                                          IsChecked="{Binding IsEnabled}"
-                                                                          IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=3}, 
-                                                                                     Path=DataContext.Player.IsPlaying, 
-                                                                                     Converter={StaticResource InverseBoolConverter}}">
-                                                                </CheckBox>
-                                                            </Border>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
-
+                                            <Border Height="50"
+                                                    BorderThickness="0, 0, 0, 1"
+                                                    BorderBrush="{x:Static SystemColors.InactiveBorderBrush}"
+                                                    Background="{Binding IsPlaying, Converter={StaticResource BoolBrushConverter}}">
+                                                <CheckBox VerticalAlignment="Center"
+                                                          VerticalContentAlignment="Center"
+                                                          HorizontalAlignment="Center"
+                                                          HorizontalContentAlignment="Center"
+                                                          Margin="5, 0, 5, 0"
+                                                          IsChecked="{Binding IsEnabled}"
+                                                          IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=2}, 
+                                                                     Path=DataContext.AreAnyPlayersPlaying, 
+                                                                     Converter={StaticResource InverseBoolConverter}}">
+                                                </CheckBox>
                                             </Border>
-                                            <!--<DataTemplate.Triggers>
-                                                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                                                    <Setter Property="Background" 
-                                                            Value="{x:Static SystemColors.WindowBrush}" 
-                                                            TargetName="MeasureContainer"/>
-                                                </Trigger>
-                                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                                    <Setter Property="Background" 
-                                                            Value="{x:Static SystemColors.InfoBrush}" 
-                                                            TargetName="MeasureContainer"/>
-                                                </Trigger>
-                                            </DataTemplate.Triggers>-->
                                         </DataTemplate>
-                                            
                                     </ItemsControl.ItemTemplate>
-
                                 </ItemsControl>
-                                   
+
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -329,7 +394,7 @@
             
         </Grid>
 
-        <StatusBar Grid.Row="2"/>
-
+        <StatusBar Grid.Row="3"/>
+        
     </Grid>
 </Window>

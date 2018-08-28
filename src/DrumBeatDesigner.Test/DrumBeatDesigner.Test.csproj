@@ -67,6 +67,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="TestProject.dbd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
