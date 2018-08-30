@@ -206,7 +206,6 @@ namespace DrumBeatDesigner.ViewModels
             _openFileDialogService.DefaultExt = "dbd";
             _openFileDialogService.Filter = "Drum Beat Designer files (*.dbd)|*.dbd";
             _openFileDialogService.FilterIndex = 0;
-            _openFileDialogService.Owner
 
             if (_openFileDialogService.ShowDialog() != true)
             {
