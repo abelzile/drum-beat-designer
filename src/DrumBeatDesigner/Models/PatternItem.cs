@@ -8,15 +8,16 @@ namespace DrumBeatDesigner.Models
 
         public bool IsEnabled
         {
-            get { return _isEnabled; }
+            get => _isEnabled;
             set
             {
-                if (value.Equals(_isEnabled)) return;
+                if (value.Equals(_isEnabled))
+                {
+                    return;
+                }
                 _isEnabled = value;
                 RaisePropertyChanged(() => IsEnabled);
             }
         }
-
-
     }
 }

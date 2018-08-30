@@ -10,10 +10,13 @@ namespace DrumBeatDesigner.Models
 
         public bool IsEnabled
         {
-            get { return _isEnabled; }
+            get => _isEnabled;
             set
             {
-                if (value.Equals(_isEnabled)) return;
+                if (value.Equals(_isEnabled))
+                {
+                    return;
+                }
                 _isEnabled = value;
                 RaisePropertyChanged(() => IsEnabled);
             }
@@ -21,13 +24,21 @@ namespace DrumBeatDesigner.Models
 
         public bool IsPlaying
         {
-            get { return _isPlaying; }
+            get => _isPlaying;
             set
             {
-                if (value.Equals(_isPlaying)) return;
+                if (value.Equals(_isPlaying))
+                {
+                    return;
+                }
                 _isPlaying = value;
                 RaisePropertyChanged(() => IsPlaying);
             }
+        }
+
+        public Beat Clone()
+        {
+            return new Beat {IsEnabled = IsEnabled, IsPlaying = IsPlaying};
         }
     }
 }

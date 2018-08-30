@@ -46,6 +46,7 @@ namespace DrumBeatDesigner.ViewModels
             DeleteInstrumentCommand = new DelegateCommand<Instrument>(DeleteInstrument, CanDeleteInstrument);
             ExportPatternCommand = new DelegateCommand(ExportPattern, CanExportPattern);
             AddPatternCommand = new DelegateCommand(AddPattern, CanAddPattern);
+            ExportSongCommand = new DelegateCommand(ExportSong, CanExportSong);
 
             PropertyChanged += ThisPropertyChanged;
         }
@@ -54,6 +55,17 @@ namespace DrumBeatDesigner.ViewModels
             : this(new SoundFileValidator(), new OpenFileDialogService())
         {
         }
+
+        public DelegateCommand AddInstrumentCommand { get; private set; }
+        public DelegateCommand<Instrument> DeleteInstrumentCommand { get; private set; }
+        public DelegateCommand ExportPatternCommand { get; private set; }
+        public DelegateCommand AddPatternCommand { get; private set; }
+        public DelegateCommand NewProjectCommand { get; private set; }
+        public DelegateCommand OpenProjectCommand { get; private set; }
+        public DelegateCommand PlayOrStopPatternCommand { get; private set; }
+        public DelegateCommand PlayOrStopSongCommand { get; private set; }
+        public DelegateCommand SaveProjectCommand { get; private set; }
+        public DelegateCommand ExportSongCommand { get; private set; }
 
         public int Bpm
         {
@@ -83,22 +95,15 @@ namespace DrumBeatDesigner.ViewModels
 
         public bool CanChangeMeasuresAndBeats => SelectedProject != null && !PatternPlayer.IsPlaying;
 
-        public DelegateCommand AddInstrumentCommand { get; private set; }
-        public DelegateCommand<Instrument> DeleteInstrumentCommand { get; private set; }
-        public DelegateCommand ExportPatternCommand { get; private set; }
-        public DelegateCommand AddPatternCommand { get; private set; }
-        public DelegateCommand NewProjectCommand { get; private set; }
-        public DelegateCommand OpenProjectCommand { get; private set; }
-        public DelegateCommand PlayOrStopPatternCommand { get; private set; }
-        public DelegateCommand PlayOrStopSongCommand { get; private set; }
-        public DelegateCommand SaveProjectCommand { get; private set; }
-
         public TimeSpan PlayTime
         {
             get => _playTime;
             set
             {
-                if (Equals(value, _playTime)) return;
+                if (Equals(value, _playTime))
+                {
+                    return;
+                }
                 _playTime = value;
                 RaisePropertyChanged(() => PlayTime);
             }
@@ -109,7 +114,10 @@ namespace DrumBeatDesigner.ViewModels
             get => _patternPlayer ?? (_patternPlayer = PatternPlayer.EmptyPlayer);
             set
             {
-                if (Equals(value, _patternPlayer)) return;
+                if (Equals(value, _patternPlayer))
+                {
+                    return;
+                }
                 _patternPlayer = value;
                 RaisePropertyChanged(() => PatternPlayer);
             }
@@ -120,7 +128,10 @@ namespace DrumBeatDesigner.ViewModels
             get => _songPlayer ?? (_songPlayer = SongPlayer.EmptyPlayer);
             set
             {
-                if (Equals(value, _songPlayer)) return;
+                if (Equals(value, _songPlayer))
+                {
+                    return;
+                }
                 _songPlayer = value;
                 RaisePropertyChanged(() => SongPlayer);
             }
@@ -131,12 +142,118 @@ namespace DrumBeatDesigner.ViewModels
             get => _selectedProject;
             set
             {
-                if (Equals(value, _selectedProject)) return;
+                if (Equals(value, _selectedProject))
+                {
+                    return;
+                }
                 _selectedProject = value;
                 RaisePropertyChanged(() => SelectedProject);
                 RaisePropertyChanged(() => CanChangeBpm);
                 RaisePropertyChanged(() => CanChangeMeasuresAndBeats);
             }
+        }
+        
+        
+        private bool CanExportPattern()
+        {
+            return !AreAnyPlayersPlaying 
+                && SelectedProject != null 
+                && SelectedProject.SelectedPattern != null
+                && SelectedProject.SelectedPattern.Instruments.Count > 0
+                && SelectedProject.SelectedPattern.Instruments[0].Beats.Count > 0;
+        }
+
+        private void ExportPattern()
+        {
+            if (SelectedProject == null)
+            {
+                throw new Exception("No current project.");
+            }
+
+            var win = new ExportLoopWindow(SelectedProject);
+
+            if (win.ShowDialog() == true)
+            {
+                var exp = new PatternExporter();
+                exp.Export(SelectedProject.SelectedPattern, Bpm, win.SavePath, win.SampleRate, win.BitsPerSample, win.Channels);
+            }
+        }
+
+
+        private bool CanNewProject()
+        {
+            return !PatternPlayer.IsPlaying;
+        }
+
+        private void NewProject()
+        {
+            SelectedProject = new Project();
+            SelectedProject.Name = "Untitled";
+
+            _cmdHelper.RaiseAll();
+        }
+
+
+        private bool CanOpenProject()
+        {
+            return !PatternPlayer.IsPlaying;
+        }
+
+        private void OpenProject()
+        {
+            _openFileDialogService.Reset();
+            _openFileDialogService.Multiselect = false;
+            _openFileDialogService.DefaultExt = "dbd";
+            _openFileDialogService.Filter = "Drum Beat Designer files (*.dbd)|*.dbd";
+            _openFileDialogService.FilterIndex = 0;
+            _openFileDialogService.Owner
+
+            if (_openFileDialogService.ShowDialog() != true)
+            {
+                return;
+            }
+
+            _savePath = new Uri(_openFileDialogService.FileName);
+
+            try
+            {
+                using (StreamReader reader = File.OpenText(_savePath.LocalPath))
+                {
+                    SelectedProject = ProjectSerializer.Deserialize(reader.ReadToEnd());
+                }
+                Bpm = SelectedProject.BeatsPerMinute;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(
+                    "This project could not be opened.",
+                    "Error Opening Project",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+        
+
+        private bool CanSaveProject()
+        {
+            return SelectedProject != null && !AreAnyPlayersPlaying;
+        }
+
+        private void SaveProject()
+        {
+            if (!EnsureSavePath()) return;
+
+            string serialized = ProjectSerializer.Serialize(SelectedProject);
+
+            File.WriteAllText(_savePath.LocalPath, serialized, Encoding.UTF8);
+
+            //SelectedProject.SetUnchanged();
+        }
+
+
+        private bool CanAddInstrument()
+        {
+            return SelectedProject != null && !AreAnyPlayersPlaying;
         }
 
         private void AddInstrument()
@@ -175,64 +292,11 @@ namespace DrumBeatDesigner.ViewModels
 
             _cmdHelper.RaiseAll();
         }
-
-        private void AddPattern()
-        {
-            if (SelectedProject == null)
-            {
-                throw new Exception("No current project.");
-            }
-
-            SelectedProject.AddPattern("Pattern " + (SelectedProject.Patterns.Count + 1));
-        }
-
-        private bool CanAddInstrument()
-        {
-            return SelectedProject != null && !AreAnyPlayersPlaying;
-        }
+        
 
         private bool CanDeleteInstrument(Instrument arg)
         {
             return !AreAnyPlayersPlaying;
-        }
-
-        private bool CanExportPattern()
-        {
-            return !AreAnyPlayersPlaying 
-                && SelectedProject != null 
-                && SelectedProject.SelectedPattern != null
-                && SelectedProject.SelectedPattern.Instruments.Count > 0
-                && SelectedProject.SelectedPattern.Instruments[0].Beats.Count > 0;
-        }
-
-        private bool CanNewProject()
-        {
-            return !PatternPlayer.IsPlaying;
-        }
-
-        private bool CanOpenProject()
-        {
-            return !PatternPlayer.IsPlaying;
-        }
-
-        private bool CanPlayOrStopPattern()
-        {
-            return SelectedProject != null && SelectedProject.SelectedPattern != null && !SongPlayer.IsPlaying;
-        }
-
-        private bool CanPlayOrStopSong()
-        {
-            return SelectedProject != null && SelectedProject.SelectedPattern != null && !PatternPlayer.IsPlaying;
-        }
-
-        private bool CanSaveProject()
-        {
-            return SelectedProject != null && !AreAnyPlayersPlaying;
-        }
-        
-        private bool CanAddPattern()
-        {
-            return SelectedProject != null && !AreAnyPlayersPlaying;
         }
 
         private void DeleteInstrument(Instrument instrument)
@@ -242,73 +306,10 @@ namespace DrumBeatDesigner.ViewModels
             _cmdHelper.RaiseAll();
         }
 
-        private bool EnsureSavePath()
+
+        private bool CanPlayOrStopPattern()
         {
-            if (_savePath == null)
-            {
-                var dlg = new SaveFileDialog { FileName = SelectedProject.Name + ".dbd" };
-
-                if (dlg.ShowDialog() != true) return false;
-
-                _savePath = new Uri(dlg.FileName);
-
-                return true;
-            }
-            return true;
-        }
-
-        private void ExportPattern()
-        {
-            if (SelectedProject == null)
-            {
-                throw new Exception("No current project.");
-            }
-
-            var win = new ExportLoopWindow(SelectedProject);
-
-            if (win.ShowDialog() == true)
-            {
-                var exp = new PatternExporter();
-                exp.Export(SelectedProject.SelectedPattern, Bpm, win.SavePath, win.SampleRate, win.BitsPerSample, win.Channels);
-            }
-        }
-
-        private void NewProject()
-        {
-            SelectedProject = new Project();
-            SelectedProject.Name = "Untitled";
-
-            _cmdHelper.RaiseAll();
-        }
-
-        private void OpenProject()
-        {
-            _openFileDialogService.Reset();
-            _openFileDialogService.Multiselect = false;
-            _openFileDialogService.DefaultExt = "dbd";
-            _openFileDialogService.Filter = "Drum Beat Designer files (*.dbd)|*.dbd";
-            _openFileDialogService.FilterIndex = 0;
-
-            if (_openFileDialogService.ShowDialog() != true) return;
-
-            _savePath = new Uri(_openFileDialogService.FileName);
-
-            try
-            {
-                using (StreamReader reader = File.OpenText(_savePath.LocalPath))
-                {
-                    SelectedProject = ProjectSerializer.Deserialize(reader.ReadToEnd());
-                }
-                Bpm = SelectedProject.BeatsPerMinute;
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(
-                    "This project could not be opened.",
-                    "Error Opening Project",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+            return SelectedProject != null && SelectedProject.SelectedPattern != null && !SongPlayer.IsPlaying;
         }
 
         private void PlayOrStopPattern()
@@ -347,6 +348,12 @@ namespace DrumBeatDesigner.ViewModels
             _cmdHelper.RaiseAll();
         }
 
+
+        private bool CanPlayOrStopSong()
+        {
+            return SelectedProject != null && SelectedProject.SelectedPattern != null && !PatternPlayer.IsPlaying;
+        }
+
         private void PlayOrStopSong()
         {
             if (SelectedProject == null)
@@ -370,7 +377,7 @@ namespace DrumBeatDesigner.ViewModels
             else
             {
                 //PlayTime = new TimeSpan();
-                
+
                 SongPlayer = new SongPlayer(SelectedProject.Patterns, Bpm);
                 SongPlayer.Stopped += OnPlayerStopped;
                 SongPlayer.Play();
@@ -379,22 +386,64 @@ namespace DrumBeatDesigner.ViewModels
             _cmdHelper.RaiseAll();
         }
 
+
+        private bool CanAddPattern()
+        {
+            return SelectedProject != null && !AreAnyPlayersPlaying;
+        }
+
+        private void AddPattern()
+        {
+            if (SelectedProject == null)
+            {
+                throw new Exception("No current project.");
+            }
+
+            SelectedProject.AddPattern("Pattern " + (SelectedProject.Patterns.Count + 1));
+
+            _cmdHelper.RaiseAll();
+        }
+
+
+        private bool CanExportSong()
+        {
+            return !AreAnyPlayersPlaying
+                   && SelectedProject != null
+                   && SelectedProject.Patterns.MaxPatternItemIndex >= 0;
+        }
+
+        private void ExportSong()
+        {
+            if (SelectedProject == null)
+            {
+                throw new Exception("No current project.");
+            }
+
+            var exp = new SongExporter2();
+            exp.Export(SelectedProject.Patterns, Bpm, @"E:\temp\song" + Guid.NewGuid() + ".wav", 44000, 16, 1);
+        }
+
+
+        private bool EnsureSavePath()
+        {
+            if (_savePath == null)
+            {
+                var dlg = new SaveFileDialog { FileName = SelectedProject.Name + ".dbd" };
+
+                if (dlg.ShowDialog() != true) return false;
+
+                _savePath = new Uri(dlg.FileName);
+
+                return true;
+            }
+            return true;
+        }
+
         private void OnPlayerStopped(object sender, EventArgs eventArgs)
         {
             _cmdHelper.RaiseAll();
 
             RaisePropertyChanged(() => AreAnyPlayersPlaying);
-        }
-
-        private void SaveProject()
-        {
-            if (!EnsureSavePath()) return;
-
-            string serialized = ProjectSerializer.Serialize(SelectedProject);
-
-            File.WriteAllText(_savePath.LocalPath, serialized, Encoding.UTF8);
-
-            //SelectedProject.SetUnchanged();
         }
 
         private void ShowException(AggregateException ex)

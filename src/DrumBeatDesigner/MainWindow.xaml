@@ -59,9 +59,6 @@
                                    Minimum="{x:Static models:Project.MinBpm}"
                                    Maximum="{x:Static models:Project.MaxBpm}"
                                    IsEnabled="{Binding CanChangeBpm}" />
-
-                <Separator/>
-
             </ToolBar>
         </ToolBarTray>
 
@@ -95,6 +92,11 @@
                         <Image Source="{Binding SongPlayer.IsPlaying, Converter={StaticResource BoolPlayStopImageConverter}}"/>
                     </Button>
 
+                    <Separator/>
+
+                    <Button Command="{Binding ExportSongCommand}">
+                        <Image Source="/Resources/Images/music.png" Style="{StaticResource ToolbarImg}"/>
+                    </Button>
 
                     <!--Label required to ensure toolbars are same height-->
                     <Label Content="" />
@@ -332,9 +334,9 @@
                         <Label Content="Length"/>
                         <xcd:IntegerUpDown Width="40"
                                            Increment="1" 
-                                           Value="{Binding Path=SelectedProject.SelectedPattern.NumberOfBeatsPerMeasure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                           Minimum="{x:Static models:Project.MinBeatsPerMeasure}"
-                                           Maximum="{x:Static models:Project.MaxBeatsPerMeasure}"
+                                           Value="{Binding Path=SelectedProject.SelectedPattern.NumberOfBeats, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                           Minimum="{x:Static models:Project.MinBeats}"
+                                           Maximum="{x:Static models:Project.MaxBeats}"
                                            ParsingNumberStyle="Integer"
                                            IsEnabled="{Binding CanChangeMeasuresAndBeats}"/>
                         

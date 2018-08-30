@@ -73,5 +73,17 @@ namespace DrumBeatDesigner.Models
                 RaisePropertyChanged(() => Volume);
             }
         }
+
+        public Instrument Clone()
+        {
+            var instrument = new Instrument {Name = Name, Path = Path, IsMuted = IsMuted, Volume = Volume};
+
+            foreach (var beat in Beats)
+            {
+                instrument.Beats.Add(beat.Clone());
+            }
+            
+            return instrument;
+        }
     }
 }

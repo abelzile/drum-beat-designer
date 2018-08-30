@@ -11,27 +11,19 @@ namespace DrumBeatDesigner.Models
         public const int DefaultBpm = 120;
         public const int MinBpm = 1;
         public const int MaxBpm = 400;
-        public const int MinMeasures = 1;
-        public const int MaxMeasures = 8;
-        public const int MinBeatsPerMeasure = 1;
-        public const int MaxBeatsPerMeasure = 16;
+        public const int MinBeats = 1;
+        public const int MaxBeats = 16;
+        public const int PatternItemsCount = 400;
 
-        public const int PatternItemsCount = 20;
-
-        string _name;
-        int _beatsPerMinute = 120;
+        private string _name;
+        private int _beatsPerMinute = 120;
+        private Pattern _selectedPattern;
         
-
-        Pattern _selectedPattern;
-        
-        public ObservableCollection<Pattern> Patterns { get; } = new ObservableCollection<Pattern>();
+        public PatternCollection Patterns { get; } = new PatternCollection();
 
         public Pattern SelectedPattern
         {
-            get
-            {
-                return _selectedPattern;
-            }
+            get => _selectedPattern;
             set
             {
                 if (value == _selectedPattern)
@@ -45,10 +37,13 @@ namespace DrumBeatDesigner.Models
 
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
-                if (value == _name) return;
+                if (value == _name)
+                {
+                    return;
+                }
                 _name = value;
                 RaisePropertyChanged(() => Name);
             }
@@ -60,7 +55,9 @@ namespace DrumBeatDesigner.Models
             get
             {
                 if (BeatsPerMinute == 0)
+                {
                     return -1;
+                }
 
                 return 1 / (double)BeatsPerMinute;
             }
@@ -68,10 +65,13 @@ namespace DrumBeatDesigner.Models
 
         public int BeatsPerMinute
         {
-            get { return _beatsPerMinute; }
+            get => _beatsPerMinute;
             set
             {
-                if (value == _beatsPerMinute) return;
+                if (value == _beatsPerMinute)
+                {
+                    return;
+                }
                 _beatsPerMinute = value;
                 RaisePropertyChanged(() => BeatsPerMinute);
             }
@@ -91,6 +91,5 @@ namespace DrumBeatDesigner.Models
                 SelectedPattern = Patterns.First();
             }
         }
-        
     }
 }

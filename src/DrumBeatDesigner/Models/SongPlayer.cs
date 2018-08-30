@@ -16,15 +16,13 @@ namespace DrumBeatDesigner.Models
 
         public event EventHandler Stopped;
 
-        public SongPlayer(IList<Pattern> patterns, int bpm)
+        public SongPlayer(PatternCollection patterns, int bpm)
         {
             _bpm = bpm;
 
-            int maxPatternItemIndex = GetMaxPatternItemIndex(patterns);
-
             Instrument nullInstrument = CreateNullInstrument(patterns);
 
-            for (int i = 0; i <= maxPatternItemIndex; ++i)
+            for (int i = 0; i <= patterns.MaxPatternItemIndex; ++i)
             {
                 var instruments = new List<Instrument>();
 
@@ -107,30 +105,6 @@ namespace DrumBeatDesigner.Models
 
             _players[_currentIndex].AllInstrumentsDone += OnAllInstrumentsDone;
             _players[_currentIndex].Play();
-        }
-
-        private static int GetMaxPatternItemIndex(IList<Pattern> patterns)
-        {
-            int startPatternItemIndex = patterns[0].PatternItems.Count - 1;
-            int maxPatternItemIndex = 0;
-
-            foreach (var pattern in patterns)
-            {
-                for (int i = startPatternItemIndex; i-- > 0;)
-                {
-                    if (pattern.PatternItems[i].IsEnabled)
-                    {
-                        if (i > maxPatternItemIndex)
-                        {
-                            maxPatternItemIndex = i;
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-            return maxPatternItemIndex;
         }
 
         private static Instrument CreateNullInstrument(IEnumerable<Pattern> patterns)

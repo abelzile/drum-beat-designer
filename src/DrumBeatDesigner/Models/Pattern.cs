@@ -6,7 +6,7 @@ namespace DrumBeatDesigner.Models
     public class Pattern : NotificationObject
     {
         string _name;
-        int _numberOfBeatsPerMeasure = 4;
+        int _numberOfBeats = 4;
 
         public Pattern(string name, int patternItemCount)
         {
@@ -38,38 +38,40 @@ namespace DrumBeatDesigner.Models
 
         public ObservableCollection<PatternItem> PatternItems { get; } = new ObservableCollection<PatternItem>();
 
-        public int NumberOfBeatsPerMeasure
+        public int NumberOfBeats
         {
-            get => _numberOfBeatsPerMeasure;
+            get => _numberOfBeats;
             set
             {
-                if (value == _numberOfBeatsPerMeasure) return;
-
-                int val = _numberOfBeatsPerMeasure;
-
-
-                if (value > _numberOfBeatsPerMeasure)
+                if (value == _numberOfBeats)
                 {
-                    _numberOfBeatsPerMeasure = value;
+                    return;
+                }
 
-                    while (val < _numberOfBeatsPerMeasure)
+                int val = _numberOfBeats;
+                
+                if (value > _numberOfBeats)
+                {
+                    _numberOfBeats = value;
+
+                    while (val < _numberOfBeats)
                     {
-                        AddBeatPerMeasure();
+                        AddBeat();
                         ++val;
                     }
                 }
                 else
                 {
-                    _numberOfBeatsPerMeasure = value;
+                    _numberOfBeats = value;
 
-                    while (val > _numberOfBeatsPerMeasure)
+                    while (val > _numberOfBeats)
                     {
-                        RemoveBeatPerMeasure();
+                        RemoveBeat();
                         --val;
                     }
                 }
 
-                RaisePropertyChanged(() => NumberOfBeatsPerMeasure);
+                RaisePropertyChanged(() => NumberOfBeats);
             }
         }
 
@@ -77,7 +79,7 @@ namespace DrumBeatDesigner.Models
         {
             var instrument = new Instrument { Path = path };
             
-            for (int i = 0; i < NumberOfBeatsPerMeasure; ++i)
+            for (int i = 0; i < NumberOfBeats; ++i)
             {
                 instrument.Beats.Add(new Beat { IsEnabled = false });
             }
@@ -85,7 +87,7 @@ namespace DrumBeatDesigner.Models
             Instruments.Add(instrument);
         }
 
-        void AddBeatPerMeasure()
+        void AddBeat()
         {
             if (Instruments.Count == 0)
             {
@@ -98,7 +100,7 @@ namespace DrumBeatDesigner.Models
             }
         }
 
-        void RemoveBeatPerMeasure()
+        void RemoveBeat()
         {
             if (Instruments.Count == 0)
             {
