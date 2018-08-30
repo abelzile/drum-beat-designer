@@ -123,8 +123,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="ExportLoopWindow.xaml.cs">
-      <DependentUpon>ExportLoopWindow.xaml</DependentUpon>
+    <Compile Include="ExportWindow.xaml.cs">
+      <DependentUpon>ExportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ISoundFileValidator.cs" />
     <Compile Include="Models\Beat.cs" />
@@ -134,14 +134,14 @@
     <Compile Include="Models\PatternItem.cs" />
     <Compile Include="Models\PatternPlayer.cs" />
     <Compile Include="Models\ProjectSerializer.cs" />
-    <Compile Include="Models\SongExporter2.cs" />
+    <Compile Include="Models\SongExporter.cs" />
     <Compile Include="Models\SongPlayer.cs" />
     <Compile Include="Models\Sound.cs" />
     <Compile Include="SoundFileValidator.cs" />
     <Compile Include="StreamTracker.cs" />
-    <Compile Include="ViewModels\ExportLoopViewModel.cs" />
+    <Compile Include="ViewModels\ExportViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
-    <Page Include="ExportLoopWindow.xaml">
+    <Page Include="ExportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
