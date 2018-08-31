@@ -126,6 +126,9 @@
     <Compile Include="ExportWindow.xaml.cs">
       <DependentUpon>ExportWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InputBoxWindow.xaml.cs">
+      <DependentUpon>InputBoxWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ISoundFileValidator.cs" />
     <Compile Include="Models\Beat.cs" />
     <Compile Include="Models\PatternCollection.cs" />
@@ -140,8 +143,13 @@
     <Compile Include="SoundFileValidator.cs" />
     <Compile Include="StreamTracker.cs" />
     <Compile Include="ViewModels\ExportViewModel.cs" />
+    <Compile Include="ViewModels\InputBoxViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="ExportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InputBoxWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

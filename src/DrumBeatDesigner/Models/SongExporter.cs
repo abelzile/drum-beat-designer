@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using NAudio.Utils;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
+
 
 namespace DrumBeatDesigner.Models
 {
-    public class SongExporter2
+    public class SongExporter
     {
         public void Export(PatternCollection patterns, int bpm, string outputPath, int sampleRate, int bitsPerSample, int channels)
         {
@@ -32,12 +28,12 @@ namespace DrumBeatDesigner.Models
                 foreach (var instrument in pattern.Instruments)
                 {
                     var newInstrument = instrument.Clone();
-
                     newInstrument.Beats.Clear();
 
                     for (int i = 0; i < maxPatternItemCount; i++)
                     {
                         PatternItem patternItem = pattern.PatternItems[i];
+
                         if (patternItem.IsEnabled)
                         {
                             foreach (var beat in instrument.Beats)
@@ -47,7 +43,7 @@ namespace DrumBeatDesigner.Models
                         }
                         else
                         {
-                            foreach (var beat in instrument.Beats)
+                            for (int j = 0; j < instrument.Beats.Count; j++)
                             {
                                 newInstrument.Beats.Add(new Beat { IsEnabled = false });
                             }
@@ -107,57 +103,5 @@ namespace DrumBeatDesigner.Models
 
             return maxBeatCount;
         }
-
-        private IList<string> Converts(IList<string> paths, WaveFormat targetFormat)
-        {
-            var outs = new List<string>();
-
-            foreach (string path in paths)
-            {
-                using (var reader = new WaveFileReader(path))
-                using (var resampler = new MediaFoundationResampler(reader, targetFormat))
-                {
-                    string newpath = @"E:\temp\conv" + Guid.NewGuid() + ".wav";
-                    WaveFileWriter.CreateWaveFile(newpath, resampler);
-
-                    outs.Add(newpath);
-                }
-            }
-
-            return outs;
-        }
-    
-
-        private static Instrument CreateNullInstrument(IEnumerable<Pattern> patterns)
-        {
-            int maxBeats = 0;
-            Uri tempPath = null;
-
-            foreach (var pattern in patterns)
-            {
-                foreach (var instrument in pattern.Instruments)
-                {
-                    if (instrument.Beats.Count > maxBeats)
-                    {
-                        maxBeats = instrument.Beats.Count;
-                        tempPath = instrument.Path;
-                    }
-                }
-            }
-
-            var nullInstrument = new Instrument
-            {
-                Path = tempPath,
-                Name = "Null Instrument"
-            };
-
-            for (int i = 0; i < maxBeats; ++i)
-            {
-                nullInstrument.Beats.Add(new Beat { IsEnabled = false });
-            }
-
-            return nullInstrument;
-        }
-
     }
 }

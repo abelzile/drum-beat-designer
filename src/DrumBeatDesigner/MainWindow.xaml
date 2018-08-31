@@ -83,8 +83,14 @@
                     <Button Command="{Binding AddPatternCommand}">
                         <Image Source="/Resources/Images/add.png" Style="{StaticResource ToolbarImg}"/>
                     </Button>
-                    
 
+                    <Button Command="{Binding DeletePatternCommand}">
+                        <Image Source="/Resources/Images/delete.png" Style="{StaticResource ToolbarImg}"/>
+                    </Button>
+
+                    <Button Command="{Binding RenamePatternCommand}">
+                        Rename
+                    </Button>
 
                     <Separator/>
 

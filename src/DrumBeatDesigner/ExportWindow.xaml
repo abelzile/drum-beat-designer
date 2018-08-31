@@ -1,13 +1,13 @@
-﻿<Window x:Class="DrumBeatDesigner.ExportLoopWindow"
+﻿<Window x:Class="DrumBeatDesigner.ExportWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:vms="clr-namespace:DrumBeatDesigner.ViewModels"
         xmlns:controls="clr-namespace:MoonAndSun.Commons.Controls;assembly=MoonAndSun.Commons"
-        Title="Export Loop" 
+        Title="Export" 
         Height="216" 
         Width="480">
     <Window.DataContext>
-        <vms:ExportLoopViewModel DialogResultChanged="ViewModelDialogResultChanged" />
+        <vms:ExportViewModel DialogResultChanged="ViewModelDialogResultChanged" />
     </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>

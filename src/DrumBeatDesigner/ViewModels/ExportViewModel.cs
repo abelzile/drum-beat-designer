@@ -7,63 +7,58 @@ using MoonAndSun.Commons.Mvvm;
 
 namespace DrumBeatDesigner.ViewModels
 {
-    public class ExportLoopViewModel : DialogViewModelBase, IDataErrorInfo
+    public class ExportViewModel : DialogViewModelBase, IDataErrorInfo
     {
-        readonly ObservableCollection<int> _bitsPerSample;
-        readonly ObservableCollection<int> _channels;
-        readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
-        readonly ObservableCollection<int> _sampleRates;
-        Project _project;
-        string _savePath;
-        string _savePathExt;
-        int _selectedBitsPerSample;
-        int _selectedChannels;
-        int _selectedSampleRate;
+        private readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
+        private Project _project;
+        private string _savePath;
+        private string _savePathExt;
+        private int _selectedBitsPerSample;
+        private int _selectedChannels;
+        private int _selectedSampleRate;
 
-        public ExportLoopViewModel()
+        public ExportViewModel()
         {
-            _sampleRates = new ObservableCollection<int> { 22050, 44100, 48000, 96000 };
-            _bitsPerSample = new ObservableCollection<int> { 8, 16, 24, 32 };
-            _channels = new ObservableCollection<int> { 1, 2 };
+            SampleRates = new ObservableCollection<int> { 22050, 44100, 48000, 96000 };
+            BitsPerSample = new ObservableCollection<int> { 8, 16, 24, 32 };
+            Channels = new ObservableCollection<int> { 1, 2 };
 
             SelectedSampleRate = 44100;
             SelectedBitsPerSample = 16;
             SelectedChannels = 1;
         }
 
-        public ObservableCollection<int> BitsPerSample
-        {
-            get { return _bitsPerSample; }
-        }
+        public ObservableCollection<int> BitsPerSample { get; }
 
-        public ObservableCollection<int> Channels
-        {
-            get { return _channels; }
-        }
+        public ObservableCollection<int> Channels { get; }
+
         public string Error { get; private set; }
 
         public Project Project
         {
-            get { return _project; }
+            get => _project;
             set
             {
-                if (Equals(value, _project)) return;
+                if (Equals(value, _project))
+                {
+                    return;
+                }
                 _project = value;
                 RaisePropertyChanged(() => Project);
             }
         }
 
-        public ObservableCollection<int> SampleRates
-        {
-            get { return _sampleRates; }
-        }
+        public ObservableCollection<int> SampleRates { get; }
 
         public string SavePath
         {
-            get { return _savePath; }
+            get => _savePath;
             set
             {
-                if (value == _savePath) return;
+                if (value == _savePath)
+                {
+                    return;
+                }
                 _savePath = value;
                 RaisePropertyChanged(() => SavePath);
             }
@@ -71,10 +66,13 @@ namespace DrumBeatDesigner.ViewModels
 
         public string SavePathExt
         {
-            get { return _savePathExt; }
+            get => _savePathExt;
             set
             {
-                if (value == _savePathExt) return;
+                if (value == _savePathExt)
+                {
+                    return;
+                }
                 _savePathExt = value;
                 RaisePropertyChanged(() => SavePathExt);
             }
@@ -82,10 +80,13 @@ namespace DrumBeatDesigner.ViewModels
 
         public int SelectedBitsPerSample
         {
-            get { return _selectedBitsPerSample; }
+            get => _selectedBitsPerSample;
             set
             {
-                if (value == _selectedBitsPerSample) return;
+                if (value == _selectedBitsPerSample)
+                {
+                    return;
+                }
                 _selectedBitsPerSample = value;
                 RaisePropertyChanged(() => SelectedBitsPerSample);
             }
@@ -93,10 +94,13 @@ namespace DrumBeatDesigner.ViewModels
 
         public int SelectedChannels
         {
-            get { return _selectedChannels; }
+            get => _selectedChannels;
             set
             {
-                if (value == _selectedChannels) return;
+                if (value == _selectedChannels)
+                {
+                    return;
+                }
                 _selectedChannels = value;
                 RaisePropertyChanged(() => SelectedChannels);
             }
@@ -104,10 +108,13 @@ namespace DrumBeatDesigner.ViewModels
 
         public int SelectedSampleRate
         {
-            get { return _selectedSampleRate; }
+            get => _selectedSampleRate;
             set
             {
-                if (value == _selectedSampleRate) return;
+                if (value == _selectedSampleRate)
+                {
+                    return;
+                }
                 _selectedSampleRate = value;
                 RaisePropertyChanged(() => SelectedSampleRate);
             }

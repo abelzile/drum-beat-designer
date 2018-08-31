@@ -1,0 +1,61 @@
+﻿<Window x:Class="DrumBeatDesigner.InputBoxWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DrumBeatDesigner"
+        xmlns:vms="clr-namespace:DrumBeatDesigner.ViewModels"
+        mc:Ignorable="d"
+        Title="Input" Height="150" Width="600">
+    <Window.DataContext>
+        <vms:InputBoxViewModel DialogResultChanged="ViewModelDialogResultChanged" />
+    </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="InputLabel" TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"></Setter>
+            <Setter Property="Margin" Value="5 20 5 20"></Setter>
+        </Style>
+        <Style x:Key="InputText" TargetType="TextBox">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5 20 5 20"/>
+        </Style>
+    </Window.Resources>
+    <Grid Style="{DynamicResource GridStyle1}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Label Content="{Binding InputLabel}" Style="{StaticResource InputLabel}"/>
+
+        <TextBox Grid.Column="1" 
+                 Style="{StaticResource InputText}" 
+                 Text="{Binding InputText, 
+                                Mode=TwoWay, 
+                                UpdateSourceTrigger=PropertyChanged,
+                                ValidatesOnDataErrors=true, 
+                                NotifyOnValidationError=true}"/>
+
+        <Grid Grid.Column="1" HorizontalAlignment="Stretch" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" 
+                    Content="OK" 
+                    Command="{Binding OkCommand}"
+                    Margin="5"/>
+            <Button Grid.Column="1" 
+                    Content="Cancel" 
+                    IsCancel="True"
+                    Margin="5"/>
+        </Grid>
+    </Grid>
+</Window>
