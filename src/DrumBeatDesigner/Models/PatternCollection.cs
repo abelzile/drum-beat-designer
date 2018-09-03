@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MoonAndSun.Commons.Mvvm;
+﻿using MoonAndSun.Commons.Mvvm;
 
 namespace DrumBeatDesigner.Models
 {

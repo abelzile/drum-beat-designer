@@ -53,6 +53,7 @@ namespace DrumBeatDesigner.ViewModels
             ExportSongCommand = new DelegateCommand(ExportSong, CanExportSong);
             DeletePatternCommand = new DelegateCommand(DeletePattern, CanDeletePattern);
             RenamePatternCommand = new DelegateCommand(RenamePattern, CanRenamePattern);
+            PatternItemCheckCommand = new DelegateCommand(PatternItemCheck);
 
             PropertyChanged += ThisPropertyChanged;
         }
@@ -74,6 +75,7 @@ namespace DrumBeatDesigner.ViewModels
         public DelegateCommand ExportSongCommand { get; }
         public DelegateCommand DeletePatternCommand { get; }
         public DelegateCommand RenamePatternCommand { get; }
+        public DelegateCommand PatternItemCheckCommand { get; }
 
         public int Bpm
         {
@@ -505,6 +507,11 @@ namespace DrumBeatDesigner.ViewModels
             {
                 SelectedProject.SelectedPattern.Name = win.InputText;
             }
+        }
+
+        private void PatternItemCheck()
+        {
+            ExportSongCommand.RaiseCanExecuteChanged();
         }
 
         private bool EnsureSavePath()

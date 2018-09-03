@@ -20,15 +20,7 @@ namespace DrumBeatDesigner.Models
                 WaveStream finalStream = ConvertTo(finalMixer, sampleRate, bitsPerSample, channels);
                 streamTracker.AddStream(finalStream);
 
-                var finalBytes = new byte[finalStream.Length];
-
-                finalStream.Read(finalBytes, 0, finalBytes.Length);
-
-                using (var finalWriter = new WaveFileWriter(outputPath, finalStream.WaveFormat))
-                {
-                    finalWriter.Write(finalBytes, 0, finalBytes.Length);
-                    finalWriter.Flush();
-                }
+                WaveFileWriter.CreateWaveFile(outputPath, finalStream);
             }
             finally
             {
@@ -36,25 +28,7 @@ namespace DrumBeatDesigner.Models
             }
         }
 
-        public void Export(Pattern pattern, int bpm, string outputPath)
-        {
-            var streamTracker = new StreamTracker();
-            var finalMixer = new WaveMixerStream32();
-            streamTracker.AddStream(finalMixer);
-
-            try
-            {
-                AddInstrumentStreamsToMixer(pattern, bpm, finalMixer, streamTracker);
-
-                WaveFileWriter.CreateWaveFile(outputPath, finalMixer);
-            }
-            finally
-            {
-                streamTracker.Dispose();
-            }
-        }
-
-        private void AddInstrumentStreamsToMixer(Pattern pattern, int bpm, WaveMixerStream32 finalMixer, StreamTracker streamTracker)
+        private static void AddInstrumentStreamsToMixer(Pattern pattern, int bpm, WaveMixerStream32 finalMixer, StreamTracker streamTracker)
         {
             double minutesPerBeat = 1 / (double) bpm;
             int msPerBeat = (int) (minutesPerBeat * 60d * 1000d);
@@ -104,18 +78,10 @@ namespace DrumBeatDesigner.Models
                     ++i;
                 }
 
-                var instrumentBytes = new byte[instrumentMixer.Length];
-
-                instrumentMixer.Read(instrumentBytes, 0, instrumentBytes.Length);
-
                 var instrumentStream = new IgnoreDisposeStream(new MemoryStream());
                 streamTracker.AddStream(instrumentStream);
 
-                using (var instrumentWriter = new WaveFileWriter(instrumentStream, instrumentMixer.WaveFormat))
-                {
-                    instrumentWriter.Write(instrumentBytes, 0, instrumentBytes.Length);
-                    instrumentWriter.Flush();
-                }
+                WaveFileWriter.WriteWavFileToStream(instrumentStream, instrumentMixer);
 
                 instrumentStream.Position = 0;
 
@@ -189,13 +155,12 @@ namespace DrumBeatDesigner.Models
             }
 
             var resampler = new MediaFoundationResampler(reader, format);
-            
-                var memStream = new MemoryStream();
+            var memStream = new MemoryStream();
 
-                WaveFileWriter.WriteWavFileToStream(memStream, resampler);
-                memStream.Position = 0;
+            WaveFileWriter.WriteWavFileToStream(memStream, resampler);
+            memStream.Position = 0;
 
-                return new WaveFileReader(memStream);
+            return new WaveFileReader(memStream);
             
         }
     }

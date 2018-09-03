@@ -65,7 +65,7 @@ namespace DrumBeatDesigner.Models
                 }
             }
 
-            __Debug(bigPattern);
+            //__Debug(bigPattern);
 
             PatternExporter exp = new PatternExporter();
             exp.Export(bigPattern, bpm, outputPath, sampleRate, bitsPerSample, channels);

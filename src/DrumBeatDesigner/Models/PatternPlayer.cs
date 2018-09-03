@@ -1,12 +1,10 @@
-﻿using Microsoft.Practices.ObjectBuilder2;
-using MoonAndSun.Commons.Mvvm;
-using SharpDX.XAudio2;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
-using Timer = System.Timers.Timer;
-
+using HighPrecisionTimer;
+using Microsoft.Practices.ObjectBuilder2;
+using MoonAndSun.Commons.Mvvm;
+using SharpDX.XAudio2;
 
 namespace DrumBeatDesigner.Models
 {
@@ -15,9 +13,9 @@ namespace DrumBeatDesigner.Models
         public static readonly PatternPlayer EmptyPlayer = new PatternPlayer();
 
         private readonly IDictionary<Instrument, InstrumentState> _instrumentStates = new Dictionary<Instrument, InstrumentState>();
-        private readonly Timer _timer;
+        private readonly MultimediaTimer _timer;
         private readonly MasteringVoice _masteringVoice;
-        private readonly XAudio2 _xAudio2;
+        private readonly XAudio2 _xAudio2 = new XAudio2();
         private readonly int _bpm;
         private readonly bool _loop;
         private bool _isPlaying;
@@ -25,9 +23,8 @@ namespace DrumBeatDesigner.Models
         public event EventHandler Stopped;
         public event EventHandler AllInstrumentsDone;
 
-        public PatternPlayer(IEnumerable<Instrument> instruments, int bpm, Timer timer, bool loop)
+        public PatternPlayer(IEnumerable<Instrument> instruments, int bpm, MultimediaTimer timer, bool loop)
         {
-            _xAudio2 = new XAudio2();
             _masteringVoice = new MasteringVoice(_xAudio2);
 
             _bpm = bpm;
@@ -40,7 +37,7 @@ namespace DrumBeatDesigner.Models
             double interval = (60d / _bpm) * 1000d;
 
             _timer = timer ?? throw new ArgumentNullException(nameof(timer));
-            _timer.Interval = interval;
+            _timer.Interval = (int)interval;
             _timer.Elapsed += OnElapsed;
         }
 
@@ -52,9 +49,9 @@ namespace DrumBeatDesigner.Models
         {
         }
 
-        public static Timer CreateNewTimer()
+        public static MultimediaTimer CreateNewTimer()
         {
-            return new Timer() { AutoReset = true };
+            return new MultimediaTimer { Resolution = 0 };
         }
 
         public bool IsPlaying
@@ -103,7 +100,10 @@ namespace DrumBeatDesigner.Models
 
             IsPlaying = true;
 
-            _timer.Start();
+            if (!_timer.IsRunning)
+            {
+                _timer.Start();
+            }
 
             PlayInstruments();
         }
@@ -114,14 +114,17 @@ namespace DrumBeatDesigner.Models
 
             IsPlaying = false;
 
-            _timer.Stop();
+            if (_timer.IsRunning)
+            {
+                _timer.Stop();
+            }
 
             StopInstruments();
 
             Stopped?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnElapsed(object sender, ElapsedEventArgs e)
+        private void OnElapsed(object sender, EventArgs e)
         {
             PlayInstruments();
         }
