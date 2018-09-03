@@ -1,5 +1,6 @@
 ﻿using System;
 using MoonAndSun.Commons.Mvvm;
+using Newtonsoft.Json;
 
 namespace DrumBeatDesigner.Models
 {
@@ -21,6 +22,12 @@ namespace DrumBeatDesigner.Models
             {
                 PatternItems.Add(new PatternItem());
             }
+        }
+
+        [JsonConstructor]
+        public Pattern(string name)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         public string Name
