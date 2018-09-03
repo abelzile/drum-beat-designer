@@ -18,11 +18,13 @@ namespace DrumBeatDesigner.ViewModels
     {
         private readonly CommandHelper _cmdHelper;
         private readonly TimeSpan _span = new TimeSpan(0, 0, 0, 1);
-        private readonly DispatcherTimer _timer;
+        private readonly DispatcherTimer _patternTimer = new DispatcherTimer();
+        private readonly DispatcherTimer _songTimer = new DispatcherTimer();
         private readonly ISoundFileValidator _soundFileValidator;
         private readonly IOpenFileDialogService _openFileDialogService;
-        private TimeSpan _playTime;
+        private TimeSpan _patternPlayTime;
         private PatternPlayer _patternPlayer;
+        private TimeSpan _songPlayTime;
         private SongPlayer _songPlayer;
         private Uri _savePath;
         private Project _selectedProject;
@@ -33,9 +35,11 @@ namespace DrumBeatDesigner.ViewModels
             _openFileDialogService = openFileDialogService;
             _cmdHelper = new CommandHelper(this);
 
-            _timer = new DispatcherTimer();
-            _timer.Tick += (sender, args) => { PlayTime = PlayTime.Add(_span); };
-            _timer.Interval = _span;
+            _patternTimer.Tick += (sender, args) => { PatternPlayTime = PatternPlayTime.Add(_span); };
+            _patternTimer.Interval = _span;
+
+            _songTimer.Tick += (sender, args) => { SongPlayTime = SongPlayTime.Add(_span); };
+            _songTimer.Interval = _span;
 
             NewProjectCommand = new DelegateCommand(NewProject, CanNewProject);
             OpenProjectCommand = new DelegateCommand(OpenProject, CanOpenProject);
@@ -99,17 +103,17 @@ namespace DrumBeatDesigner.ViewModels
 
         public bool CanChangeMeasuresAndBeats => SelectedProject != null && !AreAnyPlayersPlaying;
 
-        public TimeSpan PlayTime
+        public TimeSpan PatternPlayTime
         {
-            get => _playTime;
+            get => _patternPlayTime;
             set
             {
-                if (Equals(value, _playTime))
+                if (Equals(value, _patternPlayTime))
                 {
                     return;
                 }
-                _playTime = value;
-                RaisePropertyChanged(() => PlayTime);
+                _patternPlayTime = value;
+                RaisePropertyChanged(() => PatternPlayTime);
             }
         }
 
@@ -124,6 +128,20 @@ namespace DrumBeatDesigner.ViewModels
                 }
                 _patternPlayer = value;
                 RaisePropertyChanged(() => PatternPlayer);
+            }
+        }
+
+        public TimeSpan SongPlayTime
+        {
+            get => _songPlayTime;
+            set
+            {
+                if (Equals(value, _songPlayTime))
+                {
+                    return;
+                }
+                _songPlayTime = value;
+                RaisePropertyChanged(() => SongPlayTime);
             }
         }
 
@@ -322,7 +340,7 @@ namespace DrumBeatDesigner.ViewModels
 
             if (PatternPlayer.IsPlaying)
             {
-                _timer.Stop();
+                _patternTimer.Stop();
 
                 PatternPlayer.Stopped -= OnPlayerStopped;
                 PatternPlayer.Stop();
@@ -330,13 +348,13 @@ namespace DrumBeatDesigner.ViewModels
             }
             else
             {
-                PlayTime = new TimeSpan();
+                PatternPlayTime = new TimeSpan();
 
                 PatternPlayer = new PatternPlayer(SelectedProject.SelectedPattern.Instruments, Bpm, true);
                 PatternPlayer.Stopped += OnPlayerStopped;
                 PatternPlayer.Play();
 
-                _timer.Start();
+                _patternTimer.Start();
             }
 
             RaisePropertyChanged(() => AreAnyPlayersPlaying);
@@ -363,7 +381,7 @@ namespace DrumBeatDesigner.ViewModels
 
             if (SongPlayer.IsPlaying)
             {
-                _timer.Stop();
+                _songTimer.Stop();
 
                 SongPlayer.Stopped -= OnPlayerStopped;
                 SongPlayer.Stop();
@@ -371,11 +389,13 @@ namespace DrumBeatDesigner.ViewModels
             }
             else
             {
-                //PlayTime = new TimeSpan();
+                SongPlayTime = new TimeSpan();
 
                 SongPlayer = new SongPlayer(SelectedProject.Patterns, Bpm);
                 SongPlayer.Stopped += OnPlayerStopped;
                 SongPlayer.Play();
+
+                _songTimer.Start();
             }
 
             RaisePropertyChanged(() => AreAnyPlayersPlaying);
@@ -489,25 +509,36 @@ namespace DrumBeatDesigner.ViewModels
 
         private bool EnsureSavePath()
         {
-            if (_savePath == null)
+            if (_savePath != null)
             {
-                var dlg = new SaveFileDialog { FileName = SelectedProject.Name + ".dbd" };
-
-                if (dlg.ShowDialog() != true)
-                {
-                    return false;
-                }
-
-                _savePath = new Uri(dlg.FileName);
-
                 return true;
             }
+
+            var dlg = new SaveFileDialog { FileName = SelectedProject.Name + ".dbd" };
+
+            if (dlg.ShowDialog() != true)
+            {
+                return false;
+            }
+
+            _savePath = new Uri(dlg.FileName);
+
             return true;
         }
 
         private void OnPlayerStopped(object sender, EventArgs eventArgs)
         {
             _cmdHelper.RaiseAll();
+
+            if (_patternTimer.IsEnabled)
+            {
+                _patternTimer.Stop();
+            }
+
+            if (_songTimer.IsEnabled)
+            {
+                _songTimer.Stop();
+            }
 
             RaisePropertyChanged(() => AreAnyPlayersPlaying);
         }
