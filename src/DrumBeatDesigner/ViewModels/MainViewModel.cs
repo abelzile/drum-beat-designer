@@ -3,14 +3,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Windows;
-using System.Windows.Threading;
 using DrumBeatDesigner.Models;
+using HighPrecisionTimer;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Win32;
 using MoonAndSun.Commons.Mvvm;
 using MoonAndSun.Commons.OSServices;
 using MoonAndSun.Commons.Windows;
-
 
 namespace DrumBeatDesigner.ViewModels
 {
@@ -18,8 +17,8 @@ namespace DrumBeatDesigner.ViewModels
     {
         private readonly CommandHelper _cmdHelper;
         private readonly TimeSpan _span = new TimeSpan(0, 0, 0, 1);
-        private readonly DispatcherTimer _patternTimer = new DispatcherTimer();
-        private readonly DispatcherTimer _songTimer = new DispatcherTimer();
+        private readonly MultimediaTimer _patternTimer = new MultimediaTimer { Resolution = 0 };
+        private readonly MultimediaTimer _songTimer = new MultimediaTimer { Resolution = 0 };
         private readonly ISoundFileValidator _soundFileValidator;
         private readonly IOpenFileDialogService _openFileDialogService;
         private TimeSpan _patternPlayTime;
@@ -35,11 +34,11 @@ namespace DrumBeatDesigner.ViewModels
             _openFileDialogService = openFileDialogService;
             _cmdHelper = new CommandHelper(this);
 
-            _patternTimer.Tick += (sender, args) => { PatternPlayTime = PatternPlayTime.Add(_span); };
-            _patternTimer.Interval = _span;
+            _patternTimer.Elapsed += (sender, args) => { PatternPlayTime = PatternPlayTime.Add(_span); };
+            _patternTimer.Interval = _span.Milliseconds;
 
-            _songTimer.Tick += (sender, args) => { SongPlayTime = SongPlayTime.Add(_span); };
-            _songTimer.Interval = _span;
+            _songTimer.Elapsed += (sender, args) => { SongPlayTime = SongPlayTime.Add(_span); };
+            _songTimer.Interval = _span.Milliseconds;
 
             NewProjectCommand = new DelegateCommand(NewProject, CanNewProject);
             OpenProjectCommand = new DelegateCommand(OpenProject, CanOpenProject);
@@ -537,12 +536,12 @@ namespace DrumBeatDesigner.ViewModels
         {
             _cmdHelper.RaiseAll();
 
-            if (_patternTimer.IsEnabled)
+            if (_patternTimer.IsRunning)
             {
                 _patternTimer.Stop();
             }
 
-            if (_songTimer.IsEnabled)
+            if (_songTimer.IsRunning)
             {
                 _songTimer.Stop();
             }
