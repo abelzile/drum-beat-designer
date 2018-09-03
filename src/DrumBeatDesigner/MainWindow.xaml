@@ -125,25 +125,38 @@
                           Padding="0" Margin="0"
                           VerticalScrollBarVisibility="Hidden" 
                           HorizontalScrollBarVisibility="Disabled">
-                <ListBox 
-                         ItemsSource="{Binding SelectedProject.Patterns}" 
-                         SelectedItem="{Binding SelectedProject.SelectedPattern}" 
-                         DisplayMemberPath="Name" 
-                         Margin="0" Padding="0" BorderThickness="0" ScrollViewer.CanContentScroll="False">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <EventSetter Event="RequestBringIntoView" Handler="ListBoxItemRequestBringIntoView"/>
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Margin" Value="0" />
-                            <Setter Property="Height" Value="30" />
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
+                <Grid Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <ListBox 
+                             ItemsSource="{Binding SelectedProject.Patterns}" 
+                             SelectedItem="{Binding SelectedProject.SelectedPattern}" 
+                             DisplayMemberPath="Name" 
+                             Margin="0" Padding="0" BorderThickness="0" ScrollViewer.CanContentScroll="False">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <EventSetter Event="RequestBringIntoView" Handler="ListBoxItemRequestBringIntoView"/>
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Height" Value="30" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <TextBlock Grid.Row="1" 
+                               Height="{x:Static SystemParameters.HorizontalScrollBarHeight}" 
+                               Width="20">
+                        <!-- Shim to account for the appearance of the horizontal scrollbar in scrollviewer. -->
+                    </TextBlock>
+                </Grid>
             </ScrollViewer>
 
             <ScrollViewer Name="uxPatternItems" 
-                          Grid.Column="2" Grid.Row="1" Padding="1" ScrollChanged="ScrollViewerSynchronize">
+                          Grid.Column="2" Grid.Row="1" Padding="1" ScrollChanged="ScrollViewerSynchronize"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto" >
                 <ItemsControl ItemsSource="{Binding SelectedProject.Patterns}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

@@ -9,12 +9,11 @@ namespace DrumBeatDesigner.Models
     {
         public void Export(Pattern pattern, int bpm, string outputPath, int sampleRate, int bitsPerSample, int channels)
         {
-            var streamTracker = new StreamTracker();
-            var finalMixer = new WaveMixerStream32();
-            streamTracker.AddStream(finalMixer);
-
-            try
+            using (var streamTracker = new StreamTracker())
             {
+                var finalMixer = new WaveMixerStream32();
+                streamTracker.AddStream(finalMixer);
+
                 AddInstrumentStreamsToMixer(pattern, bpm, finalMixer, streamTracker);
 
                 WaveStream finalStream = ConvertTo(finalMixer, sampleRate, bitsPerSample, channels);
@@ -22,15 +21,11 @@ namespace DrumBeatDesigner.Models
 
                 WaveFileWriter.CreateWaveFile(outputPath, finalStream);
             }
-            finally
-            {
-                streamTracker.Dispose();
-            }
         }
 
         private static void AddInstrumentStreamsToMixer(Pattern pattern, int bpm, WaveMixerStream32 finalMixer, StreamTracker streamTracker)
         {
-            double minutesPerBeat = 1 / (double) bpm;
+            double minutesPerBeat = 1d / (double) bpm;
             int msPerBeat = (int) (minutesPerBeat * 60d * 1000d);
 
             foreach (var instrument in pattern.Instruments)
