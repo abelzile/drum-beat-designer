@@ -35,10 +35,10 @@ namespace DrumBeatDesigner.ViewModels
             _cmdHelper = new CommandHelper(this);
 
             _patternTimer.Elapsed += (sender, args) => { PatternPlayTime = PatternPlayTime.Add(_span); };
-            _patternTimer.Interval = _span.Milliseconds;
+            _patternTimer.Interval = (int)_span.TotalMilliseconds;
 
             _songTimer.Elapsed += (sender, args) => { SongPlayTime = SongPlayTime.Add(_span); };
-            _songTimer.Interval = _span.Milliseconds;
+            _songTimer.Interval = (int)_span.TotalMilliseconds;
 
             NewProjectCommand = new DelegateCommand(NewProject, CanNewProject);
             OpenProjectCommand = new DelegateCommand(OpenProject, CanOpenProject);
